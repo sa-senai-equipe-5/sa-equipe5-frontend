@@ -13,7 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import br.com.senai.senaifrontend.view.table.TelaLogin;
-
+import br.com.senai.senaifrontend.view.table.TelaPrincipalGestor;
 
 
 @SpringBootApplication
@@ -21,6 +21,8 @@ public class InitApp {
 	
 	@Autowired
   	private TelaLogin telaDeLogin;
+	
+	
 	
 	public static void main(String[] args) {
 		SpringApplicationBuilder builder = 
