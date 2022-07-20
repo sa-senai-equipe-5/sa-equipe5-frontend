@@ -1,7 +1,5 @@
 package br.com.senai.saequipe5frontend.view;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -10,9 +8,15 @@ import javax.swing.border.EmptyBorder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import br.com.senai.saequipe5frontend.client.UsuarioClient;
+import br.com.senai.saequipe5frontend.dto.Usuario;
+import br.com.senai.saequipe5frontend.enums.Perfil;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -23,13 +27,22 @@ import javax.swing.JPasswordField;
 @Component
 public class TelaLogin extends JFrame {
 
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTextField edtLogin;
+	private JPasswordField edtSenha;
+	
+
+	@Autowired
+	private UsuarioClient client;
+	
 	@Autowired
 	private TelaPrincipalGestor telaPrincipalGestor;
 	
+	@Autowired
+	private TelaPrincipalEntregador telaPrincipalEntregador;
 	
-	private JPanel contentPane;
-	private JTextField edtLogin;
-	private JPasswordField passwordField;
+	
 
 
 	public TelaLogin() {
@@ -51,13 +64,33 @@ public class TelaLogin extends JFrame {
 		
 		JButton btnLogar = new JButton("Logar");
 		btnLogar.addActionListener(new ActionListener() {
+			
+			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent e) {
-				telaPrincipalGestor.setVisible(true);
-				setVisible(false);
+				Usuario usuario = new Usuario();
+				usuario.setLogin(edtLogin.getText());
+				usuario.setSenha(edtSenha.getName());
+				navegar(usuario);
+			}
+			
+			private void navegar(Usuario usuario) {
+				Usuario usuarioLogado = client.logar(usuario);
+				if (usuarioLogado != null) {
+					if (usuarioLogado.getPerfil() == Perfil.GESTOR) {
+						telaPrincipalGestor.carregarTelaGestor(usuarioLogado);
+					}else if (usuarioLogado.getPerfil() == Perfil.ENTREGADOR) {
+						
+						telaPrincipalEntregador.setVisible(true);						
+						
+					}
+					contentPane.setVisible(false);
+				}else {
+					JOptionPane.showMessageDialog(contentPane, "Usuário não encontrado!");
+				}
 			}
 		});
 		
-		passwordField = new JPasswordField();
+		edtSenha = new JPasswordField();
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -65,7 +98,7 @@ public class TelaLogin extends JFrame {
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(passwordField, GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE))
+							.addComponent(edtSenha, GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE))
 						.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
 							.addGap(101)
 							.addComponent(btnLogar))
@@ -87,7 +120,7 @@ public class TelaLogin extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblSenha, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addComponent(edtSenha, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addGap(12)
 					.addComponent(btnLogar)
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
