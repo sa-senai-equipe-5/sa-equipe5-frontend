@@ -22,4 +22,8 @@ public class Entregador {
 	
 	private Usuario usuario;
 	
+	public String getStringDataDeNascimento() {
+		return dataDeNascimento.getDayOfMonth() + "/" + dataDeNascimento.getMonthValue() + "/" + dataDeNascimento.getYear();
+	}
+	
 }

@@ -9,6 +9,8 @@ import javax.swing.border.EmptyBorder;
 
 import org.springframework.stereotype.Component;
 
+import br.com.senai.saequipe5frontend.dto.Usuario;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -24,6 +26,10 @@ public class TelaPrincipalEntregador extends JFrame {
 	private JTextField txtUsurioLogado;
 	private JTextField edtUsuarioConectado;
 
+	public void carregarTelaEntregador(Usuario usuario) {
+		edtUsuarioConectado.setText(usuario.getNomeCompleto());
+		this.setVisible(true);
+	}
 	
 	public TelaPrincipalEntregador() {
 		setTitle("Principal (Acesso Entregador) - SA System 1.5");

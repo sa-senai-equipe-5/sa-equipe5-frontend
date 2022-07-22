@@ -65,27 +65,23 @@ public class TelaLogin extends JFrame {
 		JButton btnLogar = new JButton("Logar");
 		btnLogar.addActionListener(new ActionListener() {
 			
-			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent e) {
-				Usuario usuario = new Usuario();
-				usuario.setLogin(edtLogin.getText());
-				usuario.setSenha(edtSenha.getName());
-				navegar(usuario);
+				String loginDigitado = edtLogin.getText();
+				String senhaDigitada = String.valueOf(edtSenha.getPassword());
+				navegar(loginDigitado, senhaDigitada);
 			}
 			
-			private void navegar(Usuario usuario) {
-				Usuario usuarioLogado = client.logar(usuario);
-				if (usuarioLogado != null) {
+			private void navegar(String login, String senha) {
+				Usuario usuarioLogado = client.logar(login);
+				if (usuarioLogado != null && usuarioLogado.getSenha() != senha) {
 					if (usuarioLogado.getPerfil() == Perfil.GESTOR) {
 						telaPrincipalGestor.carregarTelaGestor(usuarioLogado);
 					}else if (usuarioLogado.getPerfil() == Perfil.ENTREGADOR) {
-						
-						telaPrincipalEntregador.setVisible(true);						
-						
+						telaPrincipalEntregador.carregarTelaEntregador(usuarioLogado);												
 					}
 					contentPane.setVisible(false);
 				}else {
-					JOptionPane.showMessageDialog(contentPane, "Usuário não encontrado!");
+					JOptionPane.showMessageDialog(contentPane, "Login ou senha inválidos.");
 				}
 			}
 		});

@@ -1,5 +1,9 @@
 package br.com.senai.saequipe5frontend.view;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -12,9 +16,13 @@ import javax.swing.border.EmptyBorder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import br.com.senai.saequipe5frontend.client.EntregadorClient;
+import br.com.senai.saequipe5frontend.client.UsuarioClient;
 import br.com.senai.saequipe5frontend.dto.Entregador;
+import br.com.senai.saequipe5frontend.dto.Usuario;
+import br.com.senai.saequipe5frontend.enums.Perfil;
 
 @Component
 public class TelaCadastroEntregador extends JFrame {
@@ -31,22 +39,24 @@ public class TelaCadastroEntregador extends JFrame {
 
 	@Autowired
 	private EntregadorClient client;
-
+	@Autowired
+	private UsuarioClient usuarioClient;
+	
 	private Entregador entregadorSalvo;
 
 	public void colocarEmEdicao(Entregador entregadorSalvo) {
 		this.edtNomeCompleto.setText(entregadorSalvo.getNomeCompleto());
-		//this.edtDataNascimento.setText(entregadorSalvo.getDataDeNascimento());
+		this.edtDataNascimento.setText(entregadorSalvo.getStringDataDeNascimento());
 		this.edtCpf.setText(entregadorSalvo.getCpf());
 		this.edtRg.setText(entregadorSalvo.getRg());
-		//this.edtLogin.setText(entregadorSalvo.getUsuario().getLogin());
-		//this.edtSenha.setText(entregadorSalvo.getUsuario().getSenha());
+		this.edtLogin.setText(entregadorSalvo.getUsuario().getLogin());
+		this.edtSenha.setText(entregadorSalvo.getUsuario().getSenha());
 		this.entregadorSalvo = entregadorSalvo;
 		setVisible(true);
 	}
 
 	public void colocarEmInclusao() {
-		this.entregadorSalvo = null;
+		this.entregadorSalvo = new Entregador();
 		this.edtNomeCompleto.setText("");
 		this.edtDataNascimento.setText("");
 		this.edtCpf.setText("");
@@ -96,6 +106,34 @@ public class TelaCadastroEntregador extends JFrame {
 		edtSenha.setColumns(10);
 
 		JButton btnSalvar = new JButton("Salvar");
+		btnSalvar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (entregadorSalvo == null) {
+					entregadorSalvo = new Entregador();
+				}
+				entregadorSalvo.setNomeCompleto(edtNomeCompleto.getText());
+				String[] camposDaData = edtDataNascimento.getText().split("/");
+				LocalDate data = LocalDate.of(Integer.parseInt(camposDaData[2]), Integer.parseInt(camposDaData[1]), Integer.parseInt(camposDaData[0]));
+				entregadorSalvo.setDataDeNascimento(data);
+				entregadorSalvo.setCpf(edtCpf.getText());
+				entregadorSalvo.setRg(edtRg.getText());
+				Usuario usuarioSalvo = entregadorSalvo.getUsuario();
+				if (usuarioSalvo == null) {
+					usuarioSalvo = new Usuario();
+					entregadorSalvo.setUsuario(usuarioSalvo);
+				}
+				usuarioSalvo.setNomeCompleto(entregadorSalvo.getNomeCompleto());
+				usuarioSalvo.setPerfil(Perfil.ENTREGADOR);
+				usuarioSalvo.setLogin(edtLogin.getText());
+				usuarioSalvo.setSenha(edtSenha.getText());
+				if (entregadorSalvo.getId() == null) {
+					client.inserir(entregadorSalvo);
+				} else {
+					client.editar(entregadorSalvo);
+				}
+				
+			}
+		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane
 				.setHorizontalGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)

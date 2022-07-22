@@ -100,6 +100,11 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 		setContentPane(contentPane);
 		
 		JButton btnAdicionar = new JButton("Adicionar");
+		btnAdicionar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				cadastro.colocarEmInclusao();
+			}
+		});
 		
 		edtNomeCompleto = new JTextField();
 		edtNomeCompleto.setColumns(10);
