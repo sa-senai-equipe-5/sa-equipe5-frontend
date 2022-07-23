@@ -1,26 +1,74 @@
 package br.com.senai.saequipe5frontend.view;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTextField;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.EmptyBorder;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
+import br.com.senai.saequipe5frontend.client.EntregaClient;
+import br.com.senai.saequipe5frontend.client.EntregadorClient;
+import br.com.senai.saequipe5frontend.dto.Entrega;
+import br.com.senai.saequipe5frontend.dto.Entregador;
+import br.com.senai.saequipe5frontend.enums.Perfil;
+
+@Component
 public class TelaCadastroEntrega extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField edtEnderecoCompleto;
-	private JTextField textField;
+	private JTextField edtDataDeEntrega;
+	private JTextPane txtDescricao;
+	private JComboBox<String> cbEntregue;
+	private JComboBox<Entregador> cbEntregador;
+	private List<Entregador> entregadores;
+	private Entrega entregaSalva;
+	@Autowired
+	private EntregadorClient entregadorClient;
+	@Autowired
+	private EntregaClient client;
+	
+	private void carregarOpcoes() {
+		this.entregadores = entregadorClient.listarTodos();
+		this.cbEntregue.addItem("SIM");
+		this.cbEntregue.addItem("NAO");
+		for (Entregador e : entregadores) {
+			this.cbEntregador.addItem(e);
+		}
+	}
+	
+	public void colocarEmEdicao(Entrega entregaSalva) {
+		this.entregaSalva = entregaSalva;
+		this.edtEnderecoCompleto.setText(entregaSalva.getEnderecoCompleto());
+		this.edtDataDeEntrega.setText(entregaSalva.getStringDataDeEntrega());
+		this.txtDescricao.setText(entregaSalva.getDescricao());
+		this.cbEntregador.setSelectedItem(entregaSalva.getEntregador());
+		this.cbEntregue.setSelectedItem(entregaSalva.getEntregue());
+		setVisible(true);
+	}
 
+	public void colocarEmInclusao() {
+		this.entregaSalva = new Entrega();
+		this.edtEnderecoCompleto.setText("");
+		this.edtDataDeEntrega.setText("");
+		this.txtDescricao.setText("");
+		this.cbEntregador.setSelectedItem(0);
+		this.cbEntregue.setSelectedItem(0);
+		setVisible(true);
+	}
 	
 	public TelaCadastroEntrega() {
 		setTitle("Entrega (INSERÇÃO/EDIÇÃO) - SA System 1.5");
@@ -39,23 +87,26 @@ public class TelaCadastroEntrega extends JFrame {
 		
 		JLabel lblEntrega = new JLabel("Entrega");
 		
-		textField = new JTextField();
-		textField.setColumns(10);
+		edtDataDeEntrega = new JTextField();
+		edtDataDeEntrega.setColumns(10);
 		
-		JComboBox cbEntregue = new JComboBox();
+		cbEntregue = new JComboBox<String>();
+		cbEntregue.setToolTipText("");
+		cbEntregador = new JComboBox<Entregador>();
+		cbEntregador.setToolTipText("");
+		this.carregarOpcoes();
 		
 		JLabel lblEntregue = new JLabel("Entregue");
 		
 		JLabel lblEntregador = new JLabel("Entregador");
 		
-		JComboBox cbEntregador = new JComboBox();
-		cbEntregador.setToolTipText("");
 		
 		JLabel lblDescrioDosProdutos = new JLabel("Descrição dos Produtos da Entrega");
 		
-		JTextPane textPane = new JTextPane();
+		txtDescricao = new JTextPane();
 		
 		JButton btnSalvar = new JButton("Salvar");
+		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
@@ -72,14 +123,14 @@ public class TelaCadastroEntrega extends JFrame {
 								.addComponent(lblEntregue, GroupLayout.PREFERRED_SIZE, 59, GroupLayout.PREFERRED_SIZE)
 								.addComponent(btnConsultar, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(textField, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
+							.addComponent(edtDataDeEntrega, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(cbEntregue, 0, 88, Short.MAX_VALUE))))
 				.addComponent(cbEntregador, 0, 424, Short.MAX_VALUE)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addComponent(lblDescrioDosProdutos, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(215, Short.MAX_VALUE))
-				.addComponent(textPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+				.addComponent(txtDescricao, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(btnSalvar, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE))
@@ -99,7 +150,7 @@ public class TelaCadastroEntrega extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(edtEnderecoCompleto, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
-						.addComponent(textField, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
+						.addComponent(edtDataDeEntrega, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
 						.addComponent(cbEntregue, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblEntregador)
@@ -108,7 +159,7 @@ public class TelaCadastroEntrega extends JFrame {
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(lblDescrioDosProdutos)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textPane, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
+					.addComponent(txtDescricao, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
 					.addComponent(btnSalvar))
 		);

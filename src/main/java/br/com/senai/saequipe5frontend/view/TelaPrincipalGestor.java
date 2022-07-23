@@ -3,6 +3,7 @@ package br.com.senai.saequipe5frontend.view;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -21,12 +22,14 @@ import br.com.senai.saequipe5frontend.dto.Usuario;
 @Component
 public class TelaPrincipalGestor extends JFrame {
 
-	@Autowired
-	private TelaListagemEntregador telaListagemEntregador;
-
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtUsurioLogado;
 	private JTextField edtUsuarioConectado;
+	@Autowired
+	private TelaListagemEntregador telaListagemEntregador;
+	@Autowired
+	private TelaListagemEntrega telaListagemEntrega;
 
 	public void carregarTelaGestor(Usuario usuario) {
 		edtUsuarioConectado.setText(usuario.getNomeCompleto());
@@ -50,6 +53,12 @@ public class TelaPrincipalGestor extends JFrame {
 		});
 
 		JButton btnEntregas = new JButton("Entregas");
+		btnEntregas.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				telaListagemEntrega.setVisible(true);
+				setVisible(false);
+			}
+		});
 
 		JButton btnSair = new JButton("Sair");
 
@@ -63,28 +72,34 @@ public class TelaPrincipalGestor extends JFrame {
 		edtUsuarioConectado.setEditable(false);
 		edtUsuarioConectado.setColumns(10);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
-		gl_contentPane.setHorizontalGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+		gl_contentPane.setHorizontalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-						.addComponent(txtUsurioLogado, GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(
-								ComponentPlacement.RELATED)
-						.addComponent(edtUsuarioConectado, GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE))
-				.addGroup(gl_contentPane.createSequentialGroup().addGap(151)
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(btnSair, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
-								.addComponent(btnEntregas, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
-								.addComponent(btnEntregadores))
-						.addContainerGap(162, Short.MAX_VALUE)));
-		gl_contentPane.setVerticalGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup().addGap(69).addComponent(btnEntregadores)
-						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(btnEntregas)
-						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(btnSair)
-						.addPreferredGap(ComponentPlacement.RELATED, 58, Short.MAX_VALUE)
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-								.addComponent(txtUsurioLogado, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE)
-								.addComponent(edtUsuarioConectado, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))));
+					.addComponent(txtUsurioLogado, GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(edtUsuarioConectado, GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE))
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(151)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(btnSair, GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
+						.addComponent(btnEntregas, GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
+						.addComponent(btnEntregadores, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(162, Short.MAX_VALUE))
+		);
+		gl_contentPane.setVerticalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(69)
+					.addComponent(btnEntregadores)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(btnEntregas)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(btnSair)
+					.addPreferredGap(ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(txtUsurioLogado, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(edtUsuarioConectado, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+		);
 		contentPane.setLayout(gl_contentPane);
 	}
 }

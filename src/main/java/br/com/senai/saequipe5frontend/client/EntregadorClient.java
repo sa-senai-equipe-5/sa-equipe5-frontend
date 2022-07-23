@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.senai.saequipe5frontend.dto.Entregador;
+import br.com.senai.saequipe5frontend.dto.Usuario;
 
 @Component
 public class EntregadorClient {
@@ -56,6 +57,13 @@ public class EntregadorClient {
 				+ "/id/" + entregadorSalvo.getId());
 	}
 	
+	public Entregador buscarPor(Usuario usuario) {
+		RestTemplate httpClient = builder.build();
+		Entregador entregador = httpClient.getForObject(urlEndpoint + resource + "/usuario/" + usuario.getId(), Entregador.class);
+
+		return entregador;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<Entregador> listarPor(String nomeCompleto){
 		
@@ -72,6 +80,10 @@ public class EntregadorClient {
 		}
 		
 		return entregadores;
+	}
+	
+	public List<Entregador> listarTodos() {
+		return this.listarPor("");
 	}
 	
 

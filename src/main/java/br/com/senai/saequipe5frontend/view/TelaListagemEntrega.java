@@ -1,27 +1,88 @@
 package br.com.senai.saequipe5frontend.view;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import org.springframework.stereotype.Component;
+import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTextField;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.TableColumnModel;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import br.com.senai.saequipe5frontend.client.EntregaClient;
+import br.com.senai.saequipe5frontend.dto.Entrega;
+import br.com.senai.saequipe5frontend.dto.Entregador;
+import br.com.senai.saequipe5frontend.view.table.EntregaTableModel;
+import br.com.senai.saequipe5frontend.view.table.EntregadorTableModel;
 @Component
 public class TelaListagemEntrega extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField edtFiltro;
+	@Autowired
+	private EntregaClient client;
+	@Autowired
+	private TelaCadastroEntrega cadastro;
 
+	private void atualizar(JTable tabela) {
+		List<Entrega> entregas = client.listarPor(edtFiltro.getText());		
+		EntregaTableModel model = new EntregaTableModel(entregas);
+		tabela.setModel(model);
+		TableColumnModel cm = tabela.getColumnModel();
+		cm.getColumn(0).setPreferredWidth(50);
+		cm.getColumn(1).setPreferredWidth(352);
+		tabela.updateUI();
+	}
+	
+	private Entrega getEntregaSelecionadaNa(JTable tabela) {
+		int linhaSelecionada = tabela.getSelectedRow();
+		if (linhaSelecionada < 0) {
+			throw new IllegalArgumentException("Nenhuma linha foi selecionada");
+		}
+		EntregaTableModel model = (EntregaTableModel) tabela.getModel();
+		Entrega itemSelecionado = model.getPor(linhaSelecionada);
+		return itemSelecionado;
+	}
+
+	private void removerRegistroDa(JTable tabela) {
+		try {
+
+			Entrega entregaSelecionada = getEntregaSelecionadaNa(tabela);
+
+			int opcaoSelecionada = JOptionPane.showConfirmDialog(contentPane, "Deseja realmente remover?!", "Remoção",
+					JOptionPane.YES_NO_OPTION);
+
+			if (opcaoSelecionada == JOptionPane.YES_OPTION) {
+				this.client.remover(entregaSelecionada);
+				((EntregaTableModel) tabela.getModel()).remover(entregaSelecionada);
+				tabela.updateUI();
+				JOptionPane.showMessageDialog(contentPane, "Entrega removida com sucesso");
+			}
+
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(contentPane, e.getMessage());
+		}
+	}
+
+	private void editarRegistroDa(JTable tabela) {
+		try {
+			Entrega registroSelecionado = getEntregaSelecionadaNa(tabela);
+			this.cadastro.colocarEmEdicao(registroSelecionado);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(contentPane, e.getMessage());
+		}
+	}
 	
 	public TelaListagemEntrega() {
 		setTitle("Entrega (LISTAGEM) - SA System 1.5");

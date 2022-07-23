@@ -1,34 +1,40 @@
 package br.com.senai.saequipe5frontend.view;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import org.springframework.stereotype.Component;
-
-import br.com.senai.saequipe5frontend.dto.Usuario;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
-import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.border.EmptyBorder;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import br.com.senai.saequipe5frontend.client.EntregadorClient;
+import br.com.senai.saequipe5frontend.dto.Entregador;
+import br.com.senai.saequipe5frontend.dto.Usuario;
 @Component
 public class TelaPrincipalEntregador extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtUsurioLogado;
 	private JTextField edtUsuarioConectado;
+	@Autowired
+	private TelaCadastroEntregador cadastro;
+	@Autowired
+	private EntregadorClient client;
+	private Entregador entregadorConectado;
 
 	public void carregarTelaEntregador(Usuario usuario) {
 		edtUsuarioConectado.setText(usuario.getNomeCompleto());
 		this.setVisible(true);
+		this.entregadorConectado = client.buscarPor(usuario);
 	}
 	
 	public TelaPrincipalEntregador() {
@@ -42,6 +48,7 @@ public class TelaPrincipalEntregador extends JFrame {
 		JButton btnEntregador = new JButton("Entregador");
 		btnEntregador.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				cadastro.colocarEmEdicao(entregadorConectado);
 			}
 		});
 		
@@ -58,16 +65,15 @@ public class TelaPrincipalEntregador extends JFrame {
 		edtUsuarioConectado.setColumns(10);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
+			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addComponent(txtUsurioLogado, GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE)
 					.addGap(6)
 					.addComponent(edtUsuarioConectado, GroupLayout.PREFERRED_SIZE, 310, GroupLayout.PREFERRED_SIZE))
-				.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
-					.addContainerGap(165, Short.MAX_VALUE)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnEntregador)
-						.addComponent(btnSair, GroupLayout.PREFERRED_SIZE, 97, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+						.addComponent(btnEntregador, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(btnSair, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE))
 					.addGap(162))
 		);
 		gl_contentPane.setVerticalGroup(

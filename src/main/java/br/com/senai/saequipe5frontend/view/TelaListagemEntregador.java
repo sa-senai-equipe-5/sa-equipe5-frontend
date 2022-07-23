@@ -67,7 +67,7 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 			Entregador entregadorSelecionado = getEntregadorSelecionadoNa(tabela);
 			
 			int opcaoSelecionada = JOptionPane.showConfirmDialog(
-					contentPane, "Deseja remover?", "Remoção", JOptionPane.YES_NO_OPTION);
+					contentPane, "Deseja realmente remover?!", "Remoção", JOptionPane.YES_NO_OPTION);
 			
 			if (opcaoSelecionada == JOptionPane.YES_OPTION) {			
 				this.client.remover(entregadorSelecionado);
@@ -124,6 +124,11 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 		JScrollPane scrollPane = new JScrollPane(tabela);
 		
 		JButton btnRemover = new JButton("Remover");
+		btnRemover.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				removerRegistroDa(tabela);
+			}
+		});
 		
 		JButton btnEditar = new JButton("Editar");
 		btnEditar.addActionListener(new ActionListener() {

@@ -22,5 +22,8 @@ public class Entrega {
 	
 	private Entregador entregador;
 	
+	public String getStringDataDeEntrega() {
+		return dataDeEntrega.getDayOfMonth() + "/" + dataDeEntrega.getMonthValue() + "/" + dataDeEntrega.getYear();
+	}
 	
 }

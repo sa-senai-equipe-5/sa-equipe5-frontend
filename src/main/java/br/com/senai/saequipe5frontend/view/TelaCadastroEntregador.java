@@ -16,10 +16,8 @@ import javax.swing.border.EmptyBorder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import br.com.senai.saequipe5frontend.client.EntregadorClient;
-import br.com.senai.saequipe5frontend.client.UsuarioClient;
 import br.com.senai.saequipe5frontend.dto.Entregador;
 import br.com.senai.saequipe5frontend.dto.Usuario;
 import br.com.senai.saequipe5frontend.enums.Perfil;
@@ -28,7 +26,6 @@ import br.com.senai.saequipe5frontend.enums.Perfil;
 public class TelaCadastroEntregador extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-
 	private JPanel contentPane;
 	private JTextField edtNomeCompleto;
 	private JTextField edtDataNascimento;
@@ -36,12 +33,8 @@ public class TelaCadastroEntregador extends JFrame {
 	private JTextField edtRg;
 	private JTextField edtLogin;
 	private JTextField edtSenha;
-
 	@Autowired
 	private EntregadorClient client;
-	@Autowired
-	private UsuarioClient usuarioClient;
-	
 	private Entregador entregadorSalvo;
 
 	public void colocarEmEdicao(Entregador entregadorSalvo) {

@@ -8,12 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.rsocket.server.RSocketServer.Transport;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import br.com.senai.saequipe5frontend.view.TelaLogin;
-import br.com.senai.saequipe5frontend.view.TelaPrincipalGestor;
 
 
 @SpringBootApplication
@@ -39,7 +37,6 @@ public class InitApp {
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						try {							
-							//Apresentar tela principal aqui
 							telaDeLogin.setVisible(true);
 						} catch (Exception e) {							
 							JOptionPane.showMessageDialog(null, e.getMessage());
