@@ -3,7 +3,6 @@ package br.com.senai.saequipe5frontend.view;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -15,6 +14,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import br.com.senai.saequipe5frontend.dto.Usuario;
@@ -30,6 +30,10 @@ public class TelaPrincipalGestor extends JFrame {
 	private TelaListagemEntregador telaListagemEntregador;
 	@Autowired
 	private TelaListagemEntrega telaListagemEntrega;
+	private Usuario usuarioConectado;
+	@Autowired
+	@Lazy
+	TelaLogin telaLogin;
 
 	public void carregarTelaGestor(Usuario usuario) {
 		edtUsuarioConectado.setText(usuario.getNomeCompleto());
@@ -47,7 +51,7 @@ public class TelaPrincipalGestor extends JFrame {
 		JButton btnEntregadores = new JButton("Entregadores");
 		btnEntregadores.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				telaListagemEntregador.setVisible(true);
+				telaListagemEntregador.acessar(usuarioConectado);
 				setVisible(false);
 			}
 		});
@@ -55,12 +59,18 @@ public class TelaPrincipalGestor extends JFrame {
 		JButton btnEntregas = new JButton("Entregas");
 		btnEntregas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				telaListagemEntrega.setVisible(true);
+				telaListagemEntrega.acessar(usuarioConectado);;
 				setVisible(false);
 			}
 		});
 
 		JButton btnSair = new JButton("Sair");
+		btnSair.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+				telaLogin.setVisible(true);
+			}
+		});
 
 		txtUsurioLogado = new JTextField();
 		txtUsurioLogado.setEditable(false);

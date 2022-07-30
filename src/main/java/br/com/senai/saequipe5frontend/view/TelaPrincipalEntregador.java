@@ -13,6 +13,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import br.com.senai.saequipe5frontend.client.EntregadorClient;
@@ -30,6 +31,9 @@ public class TelaPrincipalEntregador extends JFrame {
 	@Autowired
 	private EntregadorClient client;
 	private Entregador entregadorConectado;
+	@Autowired
+	@Lazy
+	TelaLogin telaLogin;
 
 	public void carregarTelaEntregador(Usuario usuario) {
 		edtUsuarioConectado.setText(usuario.getNomeCompleto());
@@ -48,11 +52,17 @@ public class TelaPrincipalEntregador extends JFrame {
 		JButton btnEntregador = new JButton("Entregador");
 		btnEntregador.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				cadastro.colocarEmEdicao(entregadorConectado);
+				cadastro.colocarEmEdicao(entregadorConectado, entregadorConectado.getUsuario());
 			}
 		});
 		
 		JButton btnSair = new JButton("Sair");
+		btnSair.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+				telaLogin.setVisible(true);
+			}
+		});
 		
 		txtUsurioLogado = new JTextField();
 		txtUsurioLogado.setEditable(false);

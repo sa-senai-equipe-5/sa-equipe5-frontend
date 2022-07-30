@@ -24,7 +24,7 @@ public class EntregaClient {
 	@Autowired
 	private ObjectMapper mapper;
 	
-	private final String resource = "/entrega";
+	private final String resource = "/entregas";
 	
 	@Autowired
 	private RestTemplateBuilder builder;

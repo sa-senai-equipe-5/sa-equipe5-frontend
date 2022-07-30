@@ -23,7 +23,7 @@ public class UsuarioClient {
 		RestTemplate httpClient = builder.build();
 
 		Usuario usuarioLogado = httpClient.getForObject(urlEndpoint + resource + "/login/" + login, Usuario.class);
-
+		
 		return usuarioLogado;
 	}
 }

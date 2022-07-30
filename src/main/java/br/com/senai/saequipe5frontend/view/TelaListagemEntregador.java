@@ -20,11 +20,15 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import br.com.senai.saequipe5frontend.client.EntregadorClient;
 import br.com.senai.saequipe5frontend.dto.Entregador;
+import br.com.senai.saequipe5frontend.dto.Usuario;
 import br.com.senai.saequipe5frontend.view.table.EntregadorTableModel;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 @Component
 public class TelaListagemEntregador extends JFrame implements Serializable {
@@ -40,6 +44,10 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 	private TelaCadastroEntregador cadastro;
 	
 	private JTextField edtNomeCompleto;
+	private Usuario usuarioConectado;
+	@Autowired
+	@Lazy
+	private TelaPrincipalGestor telaPrincipal;
 	
 	private void atualizar(JTable tabela) {
 		List<Entregador> entregadores = client.listarPor(edtNomeCompleto.getText());		
@@ -51,10 +59,16 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 		tabela.updateUI();
 	}
 	
+	public void acessar(Usuario usuario) {
+		this.setVisible(true);
+		this.usuarioConectado = usuario;
+		
+	}
+	
 	private Entregador getEntregadorSelecionadoNa(JTable tabela) {
 		int linhaSelecionada = tabela.getSelectedRow();
 		if (linhaSelecionada < 0) {
-			throw new IllegalArgumentException("Nenhuma linha foi selecionada");
+			throw new IllegalArgumentException("Selecione um registro na tabela para edição");
 		}
 		EntregadorTableModel model = (EntregadorTableModel)tabela.getModel();
 		Entregador itemSelecionado = model.getPor(linhaSelecionada);
@@ -84,7 +98,7 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 	private void editarRegistroDa(JTable tabela) {
 		try {		
 			Entregador registroSelecionado = getEntregadorSelecionadoNa(tabela);
-			this.cadastro.colocarEmEdicao(registroSelecionado);
+			this.cadastro.colocarEmEdicao(registroSelecionado, usuarioConectado);
 		}catch (Exception e) {
 			JOptionPane.showMessageDialog(contentPane, e.getMessage());
 		}
@@ -92,8 +106,14 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 
 	
 	public TelaListagemEntregador() {
-		setTitle("Entregador (LISTAGEM) - SA System 1.5");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				telaPrincipal.carregarTelaGestor(usuarioConectado);
+			}
+		});
+		setTitle("Entregador (LISTAGEM) - SA System 1.5");
 		setBounds(100, 100, 449, 345);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

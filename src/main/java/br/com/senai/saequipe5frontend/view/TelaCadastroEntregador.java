@@ -2,6 +2,8 @@ package br.com.senai.saequipe5frontend.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 
 import javax.swing.GroupLayout;
@@ -9,18 +11,21 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import br.com.senai.saequipe5frontend.client.EntregadorClient;
 import br.com.senai.saequipe5frontend.dto.Entregador;
 import br.com.senai.saequipe5frontend.dto.Usuario;
 import br.com.senai.saequipe5frontend.enums.Perfil;
+import br.com.senai.saequipe5frontend.exception.CampoVazioException;
 
 @Component
 public class TelaCadastroEntregador extends JFrame {
@@ -33,11 +38,17 @@ public class TelaCadastroEntregador extends JFrame {
 	private JTextField edtRg;
 	private JTextField edtLogin;
 	private JTextField edtSenha;
+	private Entregador entregadorSalvo;
+	private JButton btnConsultar;
+	private Usuario usuarioConectado;
 	@Autowired
 	private EntregadorClient client;
-	private Entregador entregadorSalvo;
+	@Autowired
+	@Lazy
+	TelaPrincipalEntregador telaPrincipalEntregador;
 
-	public void colocarEmEdicao(Entregador entregadorSalvo) {
+	public void colocarEmEdicao(Entregador entregadorSalvo, Usuario usuario) {
+		this.usuarioConectado = usuario;
 		this.edtNomeCompleto.setText(entregadorSalvo.getNomeCompleto());
 		this.edtDataNascimento.setText(entregadorSalvo.getStringDataDeNascimento());
 		this.edtCpf.setText(entregadorSalvo.getCpf());
@@ -46,6 +57,11 @@ public class TelaCadastroEntregador extends JFrame {
 		this.edtSenha.setText(entregadorSalvo.getUsuario().getSenha());
 		this.entregadorSalvo = entregadorSalvo;
 		setVisible(true);
+		if (usuario.getPerfil().equals(Perfil.ENTREGADOR)) {
+			btnConsultar.setVisible(false);
+		} else if (usuario.getPerfil().equals(Perfil.GESTOR)) {
+			btnConsultar.setVisible(true);
+		}
 	}
 
 	public void colocarEmInclusao() {
@@ -60,13 +76,25 @@ public class TelaCadastroEntregador extends JFrame {
 	}
 
 	public TelaCadastroEntregador() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				if (usuarioConectado.getPerfil().equals(Perfil.ENTREGADOR)) {
+					telaPrincipalEntregador.setVisible(true);
+				}
+			}
+		});
 		setBounds(100, 100, 444, 250);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 
-		JButton btnConsultar = new JButton("Consultar");
+		btnConsultar = new JButton("Consultar");
+		btnConsultar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+			}
+		});
 
 		JLabel lblNewLabel = new JLabel("Nome Completo");
 
@@ -101,30 +129,52 @@ public class TelaCadastroEntregador extends JFrame {
 		JButton btnSalvar = new JButton("Salvar");
 		btnSalvar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (entregadorSalvo == null) {
-					entregadorSalvo = new Entregador();
+				try {
+					if (entregadorSalvo == null) {
+						entregadorSalvo = new Entregador();
+					}
+					entregadorSalvo.setNomeCompleto(edtNomeCompleto.getText());
+					if (edtNomeCompleto.getText().isEmpty()) {
+						throw new CampoVazioException("Nome completo", 'o');
+					}
+					if (edtDataNascimento.getText().isEmpty()) {
+						throw new CampoVazioException("Data de nascimento", 'a');
+					}
+					String[] camposDaData = edtDataNascimento.getText().split("/");
+					LocalDate data = LocalDate.of(Integer.parseInt(camposDaData[2]), Integer.parseInt(camposDaData[1]),
+							Integer.parseInt(camposDaData[0]));
+					entregadorSalvo.setDataDeNascimento(data);
+					entregadorSalvo.setCpf(edtCpf.getText());
+					if (edtCpf.getText().isEmpty()) {
+						throw new CampoVazioException("CPF", 'o');
+					}
+					entregadorSalvo.setRg(edtRg.getText());
+					if (edtRg.getText().isEmpty()) {
+						throw new CampoVazioException("RG", 'o');
+					}
+					Usuario usuarioSalvo = entregadorSalvo.getUsuario();
+					if (usuarioSalvo == null) {
+						usuarioSalvo = new Usuario();
+						entregadorSalvo.setUsuario(usuarioSalvo);
+					}
+					usuarioSalvo.setNomeCompleto(entregadorSalvo.getNomeCompleto());
+					usuarioSalvo.setPerfil(Perfil.ENTREGADOR);
+					usuarioSalvo.setLogin(edtLogin.getText());
+					if (edtLogin.getText().isEmpty()) {
+						throw new CampoVazioException("Login", 'o');
+					}
+					usuarioSalvo.setSenha(edtSenha.getText());
+					if (edtSenha.getText().isEmpty()) {
+						throw new CampoVazioException("Senha", 'a');
+					}
+					if (entregadorSalvo.getId() == null) {
+						client.inserir(entregadorSalvo);
+					} else {
+						client.editar(entregadorSalvo);
+					}
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(contentPane, ex.getMessage());
 				}
-				entregadorSalvo.setNomeCompleto(edtNomeCompleto.getText());
-				String[] camposDaData = edtDataNascimento.getText().split("/");
-				LocalDate data = LocalDate.of(Integer.parseInt(camposDaData[2]), Integer.parseInt(camposDaData[1]), Integer.parseInt(camposDaData[0]));
-				entregadorSalvo.setDataDeNascimento(data);
-				entregadorSalvo.setCpf(edtCpf.getText());
-				entregadorSalvo.setRg(edtRg.getText());
-				Usuario usuarioSalvo = entregadorSalvo.getUsuario();
-				if (usuarioSalvo == null) {
-					usuarioSalvo = new Usuario();
-					entregadorSalvo.setUsuario(usuarioSalvo);
-				}
-				usuarioSalvo.setNomeCompleto(entregadorSalvo.getNomeCompleto());
-				usuarioSalvo.setPerfil(Perfil.ENTREGADOR);
-				usuarioSalvo.setLogin(edtLogin.getText());
-				usuarioSalvo.setSenha(edtSenha.getText());
-				if (entregadorSalvo.getId() == null) {
-					client.inserir(entregadorSalvo);
-				} else {
-					client.editar(entregadorSalvo);
-				}
-				
 			}
 		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);

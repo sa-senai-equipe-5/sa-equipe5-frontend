@@ -1,5 +1,7 @@
 package br.com.senai.saequipe5frontend.view;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -17,24 +19,36 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import br.com.senai.saequipe5frontend.client.EntregaClient;
 import br.com.senai.saequipe5frontend.dto.Entrega;
-import br.com.senai.saequipe5frontend.dto.Entregador;
+import br.com.senai.saequipe5frontend.dto.Usuario;
 import br.com.senai.saequipe5frontend.view.table.EntregaTableModel;
-import br.com.senai.saequipe5frontend.view.table.EntregadorTableModel;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 @Component
 public class TelaListagemEntrega extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField edtFiltro;
+	private JTable tabela;
 	@Autowired
 	private EntregaClient client;
 	@Autowired
 	private TelaCadastroEntrega cadastro;
+	@Autowired
+	@Lazy
+	private TelaPrincipalGestor telaPrincipal;
+	private Usuario usuarioConectado;
 
+	public void acessar(Usuario usuario) {
+		this.setVisible(true);
+		this.usuarioConectado = usuario;
+	}
+	
 	private void atualizar(JTable tabela) {
 		List<Entrega> entregas = client.listarPor(edtFiltro.getText());		
 		EntregaTableModel model = new EntregaTableModel(entregas);
@@ -48,7 +62,7 @@ public class TelaListagemEntrega extends JFrame {
 	private Entrega getEntregaSelecionadaNa(JTable tabela) {
 		int linhaSelecionada = tabela.getSelectedRow();
 		if (linhaSelecionada < 0) {
-			throw new IllegalArgumentException("Nenhuma linha foi selecionada");
+			throw new IllegalArgumentException("Selecione um registro na tabela para edição");
 		}
 		EntregaTableModel model = (EntregaTableModel) tabela.getModel();
 		Entrega itemSelecionado = model.getPor(linhaSelecionada);
@@ -85,14 +99,25 @@ public class TelaListagemEntrega extends JFrame {
 	}
 	
 	public TelaListagemEntrega() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				telaPrincipal.carregarTelaGestor(usuarioConectado);
+			}
+		});
 		setTitle("Entrega (LISTAGEM) - SA System 1.5");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		
 		JButton btnAdicionar = new JButton("Adicionar");
+		btnAdicionar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				cadastro.colocarEmInclusao();;
+			}
+		});
 		
 		JLabel lblNewLabel = new JLabel("Filtro");
 		
@@ -100,12 +125,27 @@ public class TelaListagemEntrega extends JFrame {
 		edtFiltro.setColumns(10);
 		
 		JButton btnNewButton = new JButton("Listar");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				atualizar(tabela);
+			}
+		});
 		
-		JScrollPane tabela = new JScrollPane();
+		JScrollPane scrollPane = new JScrollPane(tabela);
 		
 		JButton btnRemover = new JButton("Remover");
+		btnRemover.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				removerRegistroDa(tabela);
+			}
+		});
 		
 		JButton btnEditar = new JButton("Editar");
+		btnEditar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				editarRegistroDa(tabela);
+			}
+		});
 		
 		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
@@ -120,7 +160,7 @@ public class TelaListagemEntrega extends JFrame {
 							.addComponent(btnRemover, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 							.addComponent(lblNewLabel)
-							.addComponent(tabela, GroupLayout.PREFERRED_SIZE, 424, GroupLayout.PREFERRED_SIZE)
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 424, GroupLayout.PREFERRED_SIZE)
 							.addComponent(edtFiltro, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
 							.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
 								.addContainerGap(335, Short.MAX_VALUE)
@@ -141,13 +181,17 @@ public class TelaListagemEntrega extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnNewButton)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tabela, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnRemover)
 						.addComponent(btnEditar))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
+		
+		tabela = new JTable();
+		tabela.setFillsViewportHeight(true);
+		scrollPane.setViewportView(tabela);
 		contentPane.setLayout(gl_contentPane);
 	}
 }

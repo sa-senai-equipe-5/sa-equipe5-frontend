@@ -1,7 +1,11 @@
 package br.com.senai.saequipe5frontend.view;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -15,14 +19,13 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import br.com.senai.saequipe5frontend.client.EntregaClient;
 import br.com.senai.saequipe5frontend.client.EntregadorClient;
 import br.com.senai.saequipe5frontend.dto.Entrega;
 import br.com.senai.saequipe5frontend.dto.Entregador;
-import br.com.senai.saequipe5frontend.enums.Perfil;
+import br.com.senai.saequipe5frontend.exception.CampoVazioException;
 
 @Component
 public class TelaCadastroEntrega extends JFrame {
@@ -41,6 +44,7 @@ public class TelaCadastroEntrega extends JFrame {
 	@Autowired
 	private EntregaClient client;
 	
+	@PostConstruct
 	private void carregarOpcoes() {
 		this.entregadores = entregadorClient.listarTodos();
 		this.cbEntregue.addItem("SIM");
@@ -54,7 +58,7 @@ public class TelaCadastroEntrega extends JFrame {
 		this.entregaSalva = entregaSalva;
 		this.edtEnderecoCompleto.setText(entregaSalva.getEnderecoCompleto());
 		this.edtDataDeEntrega.setText(entregaSalva.getStringDataDeEntrega());
-		this.txtDescricao.setText(entregaSalva.getDescricao());
+		this.txtDescricao.setText(entregaSalva.getDescricao());		
 		this.cbEntregador.setSelectedItem(entregaSalva.getEntregador());
 		this.cbEntregue.setSelectedItem(entregaSalva.getEntregue());
 		setVisible(true);
@@ -79,6 +83,11 @@ public class TelaCadastroEntrega extends JFrame {
 		setContentPane(contentPane);
 		
 		JButton btnConsultar = new JButton("Consultar");
+		btnConsultar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+			}
+		});
 		
 		JLabel lblNewLabel = new JLabel("Endereço Completo");
 		
@@ -94,7 +103,6 @@ public class TelaCadastroEntrega extends JFrame {
 		cbEntregue.setToolTipText("");
 		cbEntregador = new JComboBox<Entregador>();
 		cbEntregador.setToolTipText("");
-		this.carregarOpcoes();
 		
 		JLabel lblEntregue = new JLabel("Entregue");
 		
@@ -106,6 +114,39 @@ public class TelaCadastroEntrega extends JFrame {
 		txtDescricao = new JTextPane();
 		
 		JButton btnSalvar = new JButton("Salvar");
+		btnSalvar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (entregaSalva == null) {
+					entregaSalva = new Entrega();
+				}
+				entregaSalva.setEnderecoCompleto(edtEnderecoCompleto.getText());
+				if (edtEnderecoCompleto.getText().isEmpty()) {
+					throw new CampoVazioException("Endereço completo", 'o');
+				}
+				if (edtDataDeEntrega.getText().isEmpty()) {
+					throw new CampoVazioException("Data de entrega", 'a');
+				}
+				String[] camposDaData = edtDataDeEntrega.getText().split("/");
+				LocalDate data = LocalDate.of(Integer.parseInt(camposDaData[2]), Integer.parseInt(camposDaData[1]),
+						Integer.parseInt(camposDaData[0]));
+				
+				entregaSalva.setDataDeEntrega(data);
+				
+				entregaSalva.setEntregue((String) cbEntregue.getSelectedItem());
+				
+				entregaSalva.setEntregador((Entregador) cbEntregador.getSelectedItem());
+
+				entregaSalva.setDescricao(txtDescricao.getText());
+				if (txtDescricao.getText().isEmpty()) {
+					throw new CampoVazioException("Descrição", 'a');
+				}
+				if (entregaSalva.getId() == null) {
+					client.inserir(entregaSalva);
+				} else {
+					client.editar(entregaSalva);
+				}
+			}
+		});
 		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(

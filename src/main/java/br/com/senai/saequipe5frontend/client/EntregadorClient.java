@@ -82,8 +82,21 @@ public class EntregadorClient {
 		return entregadores;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<Entregador> listarTodos() {
-		return this.listarPor("");
+		RestTemplate httpClient = builder.build();
+		
+		List<LinkedHashMap<String, Object>> response = httpClient.getForObject(
+				urlEndpoint + resource + "/", List.class);
+		
+		List<Entregador> entregadores = new ArrayList<Entregador>();
+		
+		for (LinkedHashMap<String, Object> item : response) {
+			Entregador entregador = mapper.convertValue(item, Entregador.class);
+			entregadores.add(entregador);
+		}
+		
+		return entregadores;
 	}
 	
 
