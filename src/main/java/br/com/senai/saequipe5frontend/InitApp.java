@@ -30,14 +30,14 @@ public class InitApp {
 	}
 	
 	@Bean	
-	public CommandLineRunner commandLineRunner(ApplicationContext ac) {
+	CommandLineRunner commandLineRunner(ApplicationContext ac) {
 		return args -> {
 			try {				
 				
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						try {							
-							telaDeLogin.setVisible(true);
+							telaDeLogin.acessar();
 						} catch (Exception e) {							
 							JOptionPane.showMessageDialog(null, e.getMessage());
 						}

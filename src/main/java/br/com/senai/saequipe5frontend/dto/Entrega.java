@@ -23,7 +23,8 @@ public class Entrega {
 	private Entregador entregador;
 	
 	public String getStringDataDeEntrega() {
-		return dataDeEntrega.getDayOfMonth() + "/" + dataDeEntrega.getMonthValue() + "/" + dataDeEntrega.getYear();
+		String[] c = dataDeEntrega.toString().split("-");
+		return c[2] + "/" + c[1] + "/" + c[0];
 	}
 	
 }

@@ -30,7 +30,6 @@ public class TelaPrincipalGestor extends JFrame {
 	private TelaListagemEntregador telaListagemEntregador;
 	@Autowired
 	private TelaListagemEntrega telaListagemEntrega;
-	private Usuario usuarioConectado;
 	@Autowired
 	@Lazy
 	TelaLogin telaLogin;
@@ -51,7 +50,7 @@ public class TelaPrincipalGestor extends JFrame {
 		JButton btnEntregadores = new JButton("Entregadores");
 		btnEntregadores.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				telaListagemEntregador.acessar(usuarioConectado);
+				telaListagemEntregador.setVisible(true);
 				setVisible(false);
 			}
 		});
@@ -59,7 +58,7 @@ public class TelaPrincipalGestor extends JFrame {
 		JButton btnEntregas = new JButton("Entregas");
 		btnEntregas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				telaListagemEntrega.acessar(usuarioConectado);;
+				telaListagemEntrega.setVisible(true);
 				setVisible(false);
 			}
 		});
@@ -68,7 +67,7 @@ public class TelaPrincipalGestor extends JFrame {
 		btnSair.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
-				telaLogin.setVisible(true);
+				telaLogin.acessar();
 			}
 		});
 
