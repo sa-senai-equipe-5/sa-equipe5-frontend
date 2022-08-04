@@ -137,7 +137,7 @@ public class TelaCadastroEntregador extends JFrame {
 						if (edtNomeCompleto.getText().isEmpty()) {
 							throw new CampoVazioException("Nome completo", 'o');
 						}
-						if (edtDataNascimento.getText().isEmpty()) {
+						if (edtDataNascimento.getText().equals("  /  /    ")) {
 							throw new CampoVazioException("Data de nascimento", 'a');
 						}
 						String[] camposDaData = edtDataNascimento.getText().split("/");
@@ -145,11 +145,11 @@ public class TelaCadastroEntregador extends JFrame {
 								Integer.parseInt(camposDaData[1]), Integer.parseInt(camposDaData[0]));
 						entregadorSalvo.setDataDeNascimento(data);
 						entregadorSalvo.setCpf(edtCpf.getText());
-						if (edtCpf.getText().isEmpty()) {
+						if (edtCpf.getText().equals("   .   .   -  ")) {
 							throw new CampoVazioException("CPF", 'o');
 						}
 						entregadorSalvo.setRg(edtRg.getText());
-						if (edtRg.getText().isEmpty()) {
+						if (edtRg.getText().equals("  .   .   ")) {
 							throw new CampoVazioException("RG", 'o');
 						}
 						Usuario usuarioSalvo = entregadorSalvo.getUsuario();
@@ -169,9 +169,11 @@ public class TelaCadastroEntregador extends JFrame {
 						}
 						if (entregadorSalvo.getId() == null) {
 							client.inserir(entregadorSalvo);
+							JOptionPane.showMessageDialog(contentPane, "Entregador inserido com sucesso");
 							entregadorSalvo = client.buscarPor(entregadorSalvo.getCpf());
 						} else {
 							client.editar(entregadorSalvo);
+							JOptionPane.showMessageDialog(contentPane, "Entregador alterado com sucesso");
 						}
 					} catch (Exception ex) {
 						JOptionPane.showMessageDialog(contentPane, ex.getMessage());
@@ -260,5 +262,6 @@ public class TelaCadastroEntregador extends JFrame {
 		} catch (Exception ex) {
 
 		}
+		setLocationRelativeTo(null);
 	}
 }

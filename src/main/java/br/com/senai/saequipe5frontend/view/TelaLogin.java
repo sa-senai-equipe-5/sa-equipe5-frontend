@@ -128,5 +128,6 @@ public class TelaLogin extends JFrame {
 								GroupLayout.PREFERRED_SIZE)
 						.addGap(12).addComponent(btnLogar).addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 		contentPane.setLayout(gl_contentPane);
+		setLocationRelativeTo(null);
 	}
 }

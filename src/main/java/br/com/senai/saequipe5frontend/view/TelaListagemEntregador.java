@@ -27,28 +27,29 @@ import org.springframework.stereotype.Component;
 
 import br.com.senai.saequipe5frontend.client.EntregadorClient;
 import br.com.senai.saequipe5frontend.dto.Entregador;
+import br.com.senai.saequipe5frontend.exception.CampoVazioException;
 import br.com.senai.saequipe5frontend.view.table.EntregadorTableModel;
 
 @Component
 public class TelaListagemEntregador extends JFrame implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private JPanel contentPane;
 
 	@Autowired
 	private EntregadorClient client;
-	
+
 	@Autowired
 	private TelaCadastroEntregador cadastro;
-	
-	private JTextField edtNomeCompleto;
+
+	private JTextField edtFiltro;
 	@Autowired
 	@Lazy
 	private TelaPrincipalGestor telaPrincipal;
 	
 	private void atualizar(JTable tabela) {
-		List<Entregador> entregadores = client.listarPor(edtNomeCompleto.getText());		
+		List<Entregador> entregadores = client.listarPor(edtFiltro.getText());
 		EntregadorTableModel model = new EntregadorTableModel(entregadores);
 		tabela.setModel(model);
 		TableColumnModel cm = tabela.getColumnModel();
@@ -56,47 +57,45 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 		cm.getColumn(1).setPreferredWidth(352);
 		tabela.updateUI();
 	}
-	
-	private Entregador getEntregadorSelecionadoNa(JTable tabela) {
+
+	private Entregador getEntregadorSelecionadoNa(JTable tabela, String botao) {
 		int linhaSelecionada = tabela.getSelectedRow();
 		if (linhaSelecionada < 0) {
-			throw new IllegalArgumentException("Selecione um registro na tabela para edição");
+			throw new IllegalArgumentException("Selecione um registro na tabela para " + botao);
 		}
-		EntregadorTableModel model = (EntregadorTableModel)tabela.getModel();
+		EntregadorTableModel model = (EntregadorTableModel) tabela.getModel();
 		Entregador itemSelecionado = model.getPor(linhaSelecionada);
 		return itemSelecionado;
 	}
-	
+
 	private void removerRegistroDa(JTable tabela) {
 		try {
-			
-			Entregador entregadorSelecionado = getEntregadorSelecionadoNa(tabela);
-			
-			int opcaoSelecionada = JOptionPane.showConfirmDialog(
-					contentPane, "Deseja realmente remover?!", "Remoção", JOptionPane.YES_NO_OPTION);
-			
-			if (opcaoSelecionada == JOptionPane.YES_OPTION) {			
+			Entregador entregadorSelecionado = getEntregadorSelecionadoNa(tabela, "remoção");
+
+			int opcaoSelecionada = JOptionPane.showConfirmDialog(contentPane, "Deseja realmente remover?!", "Remoção",
+					JOptionPane.YES_NO_OPTION);
+
+			if (opcaoSelecionada == JOptionPane.YES_OPTION) {
 				this.client.remover(entregadorSelecionado);
-				((EntregadorTableModel)tabela.getModel()).remover(entregadorSelecionado);
+				((EntregadorTableModel) tabela.getModel()).remover(entregadorSelecionado);
 				tabela.updateUI();
 				JOptionPane.showMessageDialog(contentPane, "Entregador removido com sucesso");
 			}
-			
-		}catch (Exception e) {
-			JOptionPane.showMessageDialog(contentPane, e.getMessage());
-		}
-	}
-	
-	private void editarRegistroDa(JTable tabela) {
-		try {		
-			Entregador registroSelecionado = getEntregadorSelecionadoNa(tabela);
-			this.cadastro.colocarEmEdicao(registroSelecionado);
-		}catch (Exception e) {
+
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(contentPane, e.getMessage());
 		}
 	}
 
-	
+	private void editarRegistroDa(JTable tabela) {
+		try {
+			Entregador registroSelecionado = getEntregadorSelecionadoNa(tabela, "edição");
+			this.cadastro.colocarEmEdicao(registroSelecionado);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(contentPane, e.getMessage());
+		}
+	}
+
 	public TelaListagemEntregador() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -118,8 +117,8 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 			}
 		});
 		
-		edtNomeCompleto = new JTextField();
-		edtNomeCompleto.setColumns(10);
+		edtFiltro = new JTextField();
+		edtFiltro.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Filtro");
 		
@@ -129,8 +128,15 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 		JButton btnListar = new JButton("Listar");
 		btnListar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				try {
+				if (edtFiltro.getText().isBlank()) {
+					throw new CampoVazioException("filtro", 'o');
+				}
 				atualizar(tabela);
-			}
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(contentPane, ex.getMessage());
+				}
+ 			}
 		});
 		
 		JScrollPane scrollPane = new JScrollPane(tabela);
@@ -157,7 +163,7 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 							.addComponent(lblNewLabel)
 							.addPreferredGap(ComponentPlacement.RELATED, 305, Short.MAX_VALUE)
 							.addComponent(btnAdicionar))
-						.addComponent(edtNomeCompleto, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
+						.addComponent(edtFiltro, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
 						.addComponent(btnListar)
 						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
 						.addGroup(gl_contentPane.createSequentialGroup()
@@ -178,7 +184,7 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 							.addContainerGap()
 							.addComponent(btnAdicionar)))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(edtNomeCompleto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addComponent(edtFiltro, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addGap(15)
 					.addComponent(btnListar)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -190,6 +196,6 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 					.addGap(173))
 		);
 		contentPane.setLayout(gl_contentPane);
-		
+		setLocationRelativeTo(null);
 	}
 }

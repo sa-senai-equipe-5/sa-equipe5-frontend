@@ -5,7 +5,7 @@ public class CampoVazioException extends IllegalArgumentException{
 	private static final long serialVersionUID = 1L;
 
 	public CampoVazioException(String campo, char genero) {
-		super(String.valueOf(genero).toUpperCase() + " " + campo + " não foi informad" + String.valueOf(genero).toLowerCase() + ".");
+		super(String.valueOf(genero).toUpperCase() + " " + campo + " é obrigatóri" + String.valueOf(genero).toLowerCase() + ".");
 	}
-	
+
 }

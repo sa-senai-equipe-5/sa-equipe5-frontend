@@ -129,7 +129,7 @@ public class TelaCadastroEntrega extends JFrame {
 					if (edtEnderecoCompleto.getText().isEmpty()) {
 						throw new CampoVazioException("Endereço completo", 'o');
 					}
-					if (edtDataDeEntrega.getText().isEmpty()) {
+					if (edtDataDeEntrega.getText().equals("  /  /    ")) {
 						throw new CampoVazioException("Data de entrega", 'a');
 					}
 					String[] camposDaData = edtDataDeEntrega.getText().split("/");
@@ -148,9 +148,11 @@ public class TelaCadastroEntrega extends JFrame {
 					}
 					if (entregaSalva.getId() == null) {
 						client.inserir(entregaSalva);
+						JOptionPane.showMessageDialog(contentPane, "Entrega inserida com sucesso");
 						entregaSalva = client.buscarMaisRecente();
 					} else {
 						client.editar(entregaSalva);
+						JOptionPane.showMessageDialog(contentPane, "Entrega alterada com sucesso");
 					}
 				} catch (Exception ex) {
 					JOptionPane.showMessageDialog(contentPane, ex.getMessage());
@@ -211,5 +213,6 @@ public class TelaCadastroEntrega extends JFrame {
 		} catch (Exception e) {
 			
 		}
+		setLocationRelativeTo(null);
 	}
 }

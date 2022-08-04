@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import br.com.senai.saequipe5frontend.client.EntregaClient;
 import br.com.senai.saequipe5frontend.dto.Entrega;
+import br.com.senai.saequipe5frontend.exception.CampoVazioException;
 import br.com.senai.saequipe5frontend.view.table.EntregaTableModel;
 @Component
 public class TelaListagemEntrega extends JFrame {
@@ -52,10 +53,10 @@ public class TelaListagemEntrega extends JFrame {
 		tabela.updateUI();
 	}
 	
-	private Entrega getEntregaSelecionadaNa(JTable tabela) {
+	private Entrega getEntregaSelecionadaNa(JTable tabela, String botao) {
 		int linhaSelecionada = tabela.getSelectedRow();
 		if (linhaSelecionada < 0) {
-			throw new IllegalArgumentException("Selecione um registro na tabela para edição");
+			throw new IllegalArgumentException("Selecione um registro na tabela para " + botao);
 		}
 		EntregaTableModel model = (EntregaTableModel) tabela.getModel();
 		Entrega itemSelecionado = model.getPor(linhaSelecionada);
@@ -65,7 +66,7 @@ public class TelaListagemEntrega extends JFrame {
 	private void removerRegistroDa(JTable tabela) {
 		try {
 
-			Entrega entregaSelecionada = getEntregaSelecionadaNa(tabela);
+			Entrega entregaSelecionada = getEntregaSelecionadaNa(tabela, "remoção");
 
 			int opcaoSelecionada = JOptionPane.showConfirmDialog(contentPane, "Deseja realmente remover?!", "Remoção",
 					JOptionPane.YES_NO_OPTION);
@@ -84,7 +85,7 @@ public class TelaListagemEntrega extends JFrame {
 
 	private void editarRegistroDa(JTable tabela) {
 		try {
-			Entrega registroSelecionado = getEntregaSelecionadaNa(tabela);
+			Entrega registroSelecionado = getEntregaSelecionadaNa(tabela, "edição");
 			this.cadastro.colocarEmEdicao(registroSelecionado);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(contentPane, e.getMessage());
@@ -120,7 +121,14 @@ public class TelaListagemEntrega extends JFrame {
 		JButton btnNewButton = new JButton("Listar");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				try {
+				if (edtFiltro.getText().isBlank()) {
+					throw new CampoVazioException("filtro", 'o');
+				}
 				atualizar(tabela);
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(contentPane, ex.getMessage());
+				}
 			}
 		});
 		
@@ -186,5 +194,6 @@ public class TelaListagemEntrega extends JFrame {
 		tabela.setFillsViewportHeight(true);
 		scrollPane.setViewportView(tabela);
 		contentPane.setLayout(gl_contentPane);
+		setLocationRelativeTo(null);
 	}
 }
