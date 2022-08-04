@@ -56,12 +56,6 @@ public class EntregaClient {
 				+ "/id/" + entregaSalva.getId());
 	}
 	
-	public Entrega buscarMaisRecente() {
-		RestTemplate httpClient = builder.build();
-		Entrega entrega = httpClient.getForObject(urlEndpoint + resource + "/last", Entrega.class);
-		return entrega;
-	}
-	
 	@SuppressWarnings("unchecked")
 	public List<Entrega> listarPor(String enderecoCompleto){
 		

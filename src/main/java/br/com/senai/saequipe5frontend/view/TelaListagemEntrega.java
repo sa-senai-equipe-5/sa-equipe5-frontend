@@ -2,8 +2,6 @@ package br.com.senai.saequipe5frontend.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -26,7 +24,10 @@ import org.springframework.stereotype.Component;
 
 import br.com.senai.saequipe5frontend.client.EntregaClient;
 import br.com.senai.saequipe5frontend.dto.Entrega;
+import br.com.senai.saequipe5frontend.dto.Usuario;
 import br.com.senai.saequipe5frontend.view.table.EntregaTableModel;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 @Component
 public class TelaListagemEntrega extends JFrame {
 
@@ -41,6 +42,12 @@ public class TelaListagemEntrega extends JFrame {
 	@Autowired
 	@Lazy
 	private TelaPrincipalGestor telaPrincipal;
+	private Usuario usuarioConectado;
+
+	public void acessar(Usuario usuario) {
+		this.setVisible(true);
+		this.usuarioConectado = usuario;
+	}
 	
 	private void atualizar(JTable tabela) {
 		List<Entrega> entregas = client.listarPor(edtFiltro.getText());		
@@ -96,7 +103,7 @@ public class TelaListagemEntrega extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) {
-				telaPrincipal.setVisible(true);
+				telaPrincipal.carregarTelaGestor(usuarioConectado);
 			}
 		});
 		setTitle("Entrega (LISTAGEM) - SA System 1.5");

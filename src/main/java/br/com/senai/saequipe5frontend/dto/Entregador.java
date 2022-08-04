@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -23,8 +24,7 @@ public class Entregador {
 	private Usuario usuario;
 	
 	public String getStringDataDeNascimento() {
-		String[] c = dataDeNascimento.toString().split("-");
-		return c[2] + "/" + c[1] + "/" + c[0];
+		return dataDeNascimento.getDayOfMonth() + "/" + dataDeNascimento.getMonthValue() + "/" + dataDeNascimento.getYear();
 	}
 	
 	public String toString() {

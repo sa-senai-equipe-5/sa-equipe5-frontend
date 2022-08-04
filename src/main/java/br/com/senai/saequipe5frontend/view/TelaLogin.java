@@ -43,12 +43,6 @@ public class TelaLogin extends JFrame {
 	@Autowired
 	private TelaPrincipalEntregador telaPrincipalEntregador;
 
-	public void acessar() {
-		this.edtLogin.setText("");
-		this.edtSenha.setText("");
-		this.setVisible(true);
-	}
-	
 	public TelaLogin() {
 		setTitle("Login - SA System 1.5");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

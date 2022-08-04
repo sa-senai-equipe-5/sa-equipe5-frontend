@@ -52,7 +52,7 @@ public class TelaPrincipalEntregador extends JFrame {
 		JButton btnEntregador = new JButton("Entregador");
 		btnEntregador.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				cadastro.acessarComoEntregador(entregadorConectado);
+				cadastro.colocarEmEdicao(entregadorConectado, entregadorConectado.getUsuario());
 			}
 		});
 		
@@ -60,7 +60,7 @@ public class TelaPrincipalEntregador extends JFrame {
 		btnSair.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
-				telaLogin.acessar();
+				telaLogin.setVisible(true);
 			}
 		});
 		

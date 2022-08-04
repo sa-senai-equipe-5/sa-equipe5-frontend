@@ -60,12 +60,7 @@ public class EntregadorClient {
 	public Entregador buscarPor(Usuario usuario) {
 		RestTemplate httpClient = builder.build();
 		Entregador entregador = httpClient.getForObject(urlEndpoint + resource + "/usuario/" + usuario.getId(), Entregador.class);
-		return entregador;
-	}
-	
-	public Entregador buscarPor(String cpf) {
-		RestTemplate httpClient = builder.build();
-		Entregador entregador = httpClient.getForObject(urlEndpoint + resource + "/cpf/" + cpf, Entregador.class);
+
 		return entregador;
 	}
 	

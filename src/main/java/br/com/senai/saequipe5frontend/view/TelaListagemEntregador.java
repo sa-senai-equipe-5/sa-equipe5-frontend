@@ -2,8 +2,6 @@ package br.com.senai.saequipe5frontend.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.Serializable;
 import java.util.List;
 
@@ -27,7 +25,10 @@ import org.springframework.stereotype.Component;
 
 import br.com.senai.saequipe5frontend.client.EntregadorClient;
 import br.com.senai.saequipe5frontend.dto.Entregador;
+import br.com.senai.saequipe5frontend.dto.Usuario;
 import br.com.senai.saequipe5frontend.view.table.EntregadorTableModel;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 @Component
 public class TelaListagemEntregador extends JFrame implements Serializable {
@@ -43,6 +44,7 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 	private TelaCadastroEntregador cadastro;
 	
 	private JTextField edtNomeCompleto;
+	private Usuario usuarioConectado;
 	@Autowired
 	@Lazy
 	private TelaPrincipalGestor telaPrincipal;
@@ -55,6 +57,12 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 		cm.getColumn(0).setPreferredWidth(50);
 		cm.getColumn(1).setPreferredWidth(352);
 		tabela.updateUI();
+	}
+	
+	public void acessar(Usuario usuario) {
+		this.setVisible(true);
+		this.usuarioConectado = usuario;
+		
 	}
 	
 	private Entregador getEntregadorSelecionadoNa(JTable tabela) {
@@ -90,7 +98,7 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 	private void editarRegistroDa(JTable tabela) {
 		try {		
 			Entregador registroSelecionado = getEntregadorSelecionadoNa(tabela);
-			this.cadastro.colocarEmEdicao(registroSelecionado);
+			this.cadastro.colocarEmEdicao(registroSelecionado, usuarioConectado);
 		}catch (Exception e) {
 			JOptionPane.showMessageDialog(contentPane, e.getMessage());
 		}
@@ -102,7 +110,7 @@ public class TelaListagemEntregador extends JFrame implements Serializable {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) {
-				telaPrincipal.setVisible(true);
+				telaPrincipal.carregarTelaGestor(usuarioConectado);
 			}
 		});
 		setTitle("Entregador (LISTAGEM) - SA System 1.5");
